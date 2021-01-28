@@ -29,8 +29,8 @@ const walls = [
 World.add(world, walls);
 
 //Maze Generation
-const rows = 5;
-const columns = 5;
+const rows = 10;
+const columns = 10;
 const grid = Array.from(Array(rows), () => Array(columns).fill(false));
 const verticalWalls = Array.from(Array(rows), () => Array(columns - 1).fill(true));
 const horizontalWalls = Array.from(Array(rows - 1), () => Array(columns).fill(true));
@@ -97,7 +97,10 @@ function drawMaze() {
             if (wall) {
                 const xPos = (j + 0.5) * cellWidth;
                 const yPos = (i + 1) * cellHeight;
-                const wallRender = Bodies.rectangle(xPos, yPos, cellWidth, wallThickness, { isStatic: true });
+                const wallRender = Bodies.rectangle(xPos, yPos, cellWidth, wallThickness, { 
+                    label: 'wall',
+                    isStatic: true 
+                });
                 World.add(world, wallRender);
             }
         }
@@ -109,7 +112,10 @@ function drawMaze() {
             if (wall) {
                 const xPos = (j + 1) * cellWidth;
                 const yPos = (i + 0.5) * cellHeight;
-                const wallRender = Bodies.rectangle(xPos, yPos, wallThickness, cellHeight, { isStatic: true });
+                const wallRender = Bodies.rectangle(xPos, yPos, wallThickness, cellHeight, { 
+                    label: 'wall',
+                    isStatic: true 
+                });
                 World.add(world, wallRender);
             }
         }
@@ -160,3 +166,18 @@ generateMaze(startRow, startCol);
 drawMaze();
 addGoal();
 addPlayer();
+
+//Win Condition
+Events.on(engine,'collisionStart', event =>{
+    const labels = ['player', 'goal'];
+    for (const collision of event.pairs) {
+        if(labels.includes(collision.bodyA.label) && labels.includes(collision.bodyB.label)){
+            world.gravity.y = 1;
+            for (const body of world.bodies) {
+                if(body.label === 'wall'){
+                    Body.setStatic(body, false);
+                }
+            }
+        }
+    }
+});
