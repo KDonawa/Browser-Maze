@@ -10,7 +10,7 @@ const render = Render.create({
     element: document.body,
     engine: engine,
     options: {
-        wireframes: true,
+        wireframes: false,
         width: borderWidth,
         height: borderHeight
     }
@@ -99,7 +99,8 @@ function drawMaze() {
                 const yPos = (i + 1) * cellHeight;
                 const wallRender = Bodies.rectangle(xPos, yPos, cellWidth, wallThickness, { 
                     label: 'wall',
-                    isStatic: true 
+                    isStatic: true,
+                    render: {fillStyle: 'black'}
                 });
                 World.add(world, wallRender);
             }
@@ -114,7 +115,8 @@ function drawMaze() {
                 const yPos = (i + 0.5) * cellHeight;
                 const wallRender = Bodies.rectangle(xPos, yPos, wallThickness, cellHeight, { 
                     label: 'wall',
-                    isStatic: true 
+                    isStatic: true,
+                    render: {fillStyle: 'black'}
                 });
                 World.add(world, wallRender);
             }
@@ -128,7 +130,8 @@ function addGoal() {
     const yPos = borderHeight - 0.5 * cellHeight;
     const goal = Bodies.rectangle(xPos, yPos, cellWidth*0.5, cellHeight*0.5, {
         isStatic:true,
-        label: 'goal'
+        label: 'goal',
+        render: {fillStyle: 'green'}
     });
     World.add(world, goal);
 }
@@ -137,7 +140,10 @@ function addPlayer(){
     const xPos = cellWidth/2;
     const yPos = cellHeight/2;
     const r = cellWidth < cellHeight ? 0.25*cellWidth : 0.25*cellHeight;
-    const player = Bodies.circle(xPos, yPos, r, {label: 'player'});
+    const player = Bodies.circle(xPos, yPos, r, {
+        label: 'player',
+        render: {fillStyle: 'red'}
+    });
     World.add(world, player);  
     
     //movement
