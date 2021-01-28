@@ -18,11 +18,12 @@ Render.run(render);
 Runner.run(Runner.create(), engine);
 
 //Generate Walls
+const borderThickness = 10;
 const walls = [
-    Bodies.rectangle(borderWidth / 2, 0, borderWidth, 40, { isStatic: true }),
-    Bodies.rectangle(borderWidth / 2, borderHeight, borderWidth, 40, { isStatic: true }),
-    Bodies.rectangle(0, borderHeight / 2, 40, borderHeight, { isStatic: true }),
-    Bodies.rectangle(borderHeight, borderHeight / 2, 40, borderHeight, { isStatic: true })
+    Bodies.rectangle(borderWidth / 2, 0, borderWidth, borderThickness, { isStatic: true }),
+    Bodies.rectangle(borderWidth / 2, borderHeight, borderWidth, borderThickness, { isStatic: true }),
+    Bodies.rectangle(0, borderHeight / 2, borderThickness, borderHeight, { isStatic: true }),
+    Bodies.rectangle(borderWidth, borderHeight / 2, borderThickness, borderHeight, { isStatic: true })
 ];
 World.add(world, walls);
 
@@ -30,54 +31,54 @@ World.add(world, walls);
 const rows = 5;
 const columns = 5;
 const grid = Array.from(Array(rows), () => Array(columns).fill(false));
-const verticals = Array.from(Array(rows), () => Array(columns - 1).fill(false));
-const horizontals = Array.from(Array(rows - 1), () => Array(columns).fill(false));
+const verticalWalls = Array.from(Array(rows), () => Array(columns - 1).fill(true));
+const horizontalWalls = Array.from(Array(rows - 1), () => Array(columns).fill(true));
 
 function generateMaze(r, c) {
-    if (hasVisited([r,c])) return;
+    if (hasVisited([r, c])) return;
 
     grid[r][c] = true; // mark as visited
     const neighbors = shuffle(getNeighbors(r, c));
     for (const neighbor of neighbors) {
-        if(!hasVisited(neighbor)) moveTo(neighbor);
+        if (!hasVisited(neighbor)) moveTo(neighbor);
     }
 }
 
 function moveTo([r, c, dir]) {
     switch (dir) {
         case 'left':
-            verticals[r][c] = true;
+            verticalWalls[r][c] = false;
             break;
         case 'right':
-            verticals[r][c-1] = true;
+            verticalWalls[r][c - 1] = false;
             break;
         case 'up':
-            horizontals[r][c] = true;
+            horizontalWalls[r][c] = false;
             break;
         case 'down':
-            horizontals[r-1][c] = true;
+            horizontalWalls[r - 1][c] = false;
             break;
         default:
             console.log("invalid direction");
             break;
     }
-    generateMaze(r,c);
+    generateMaze(r, c);
 }
 
 function getNeighbors(r, c) {
     return [
-        [r, c - 1, 'left'], 
-        [r, c + 1, 'right'], 
-        [r - 1, c, 'up'], 
+        [r, c - 1, 'left'],
+        [r, c + 1, 'right'],
+        [r - 1, c, 'up'],
         [r + 1, c, 'down']
     ].filter(x => isValidNeighbor(x));
 }
 
 function isValidNeighbor([r, c]) {
-    return (r >= 0 && r < rows) && (c >= 0 && c < columns) && !hasVisited([r,c]);
+    return (r >= 0 && r < rows) && (c >= 0 && c < columns) && !hasVisited([r, c]);
 }
 
-const hasVisited = ([r,c]) => grid[r][c] === true;
+const hasVisited = ([r, c]) => grid[r][c] === true;
 
 function shuffle(arr) {
     for (let i = arr.length - 1; i >= 0; i--) {
@@ -87,6 +88,38 @@ function shuffle(arr) {
     return arr;
 }
 
+//Draw Maze
+const wallThickness = 5;
+const cellWidth = borderWidth / columns;
+const cellHeight = borderHeight / rows;
+function drawMaze() {
+    //draw Horizontal walls
+    for (let i = 0; i < horizontalWalls.length; i++) {
+        for (let j = 0; j < horizontalWalls[i].length; j++) {
+            const wall = horizontalWalls[i][j];
+            if (wall) {
+                const xPos = (j + 0.5) * cellWidth;
+                const yPos = (i + 1) * cellHeight;
+                const wallRender = Bodies.rectangle(xPos, yPos, cellWidth, wallThickness, {isStatic: true});
+                World.add(world, wallRender);
+            }
+        }
+    }
+    // draw Vertical walls
+    for (let i = 0; i < verticalWalls.length; i++) {
+        for (let j = 0; j < verticalWalls[i].length; j++) {
+            const wall = verticalWalls[i][j];
+            if (wall) {
+                const xPos = (j + 1) * cellWidth;
+                const yPos = (i + 0.5) * cellHeight;
+                const wallRender = Bodies.rectangle(xPos, yPos, wallThickness, cellHeight, {isStatic: true});
+                World.add(world, wallRender);
+            }
+        }
+    }
+}
+
 const startRow = Math.floor(Math.random() * rows);
 const startCol = Math.floor(Math.random() * columns);
 generateMaze(startRow, startCol);
+drawMaze();
