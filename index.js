@@ -1,5 +1,5 @@
-const borderWidth = 600;
-const borderHeight = 600;
+const borderWidth = window.innerWidth;
+const borderHeight = window.innerHeight;
 
 const { Engine, Render, Runner, World, Bodies, Body, Events } = Matter;
 
@@ -19,18 +19,18 @@ Render.run(render);
 Runner.run(Runner.create(), engine);
 
 //Generate Walls
-const borderThickness = 10;
+const borderThickness = 5;
 const walls = [
-    Bodies.rectangle(borderWidth / 2, 0, borderWidth, borderThickness, { isStatic: true }),
-    Bodies.rectangle(borderWidth / 2, borderHeight, borderWidth, borderThickness, { isStatic: true }),
-    Bodies.rectangle(0, borderHeight / 2, borderThickness, borderHeight, { isStatic: true }),
-    Bodies.rectangle(borderWidth, borderHeight / 2, borderThickness, borderHeight, { isStatic: true })
+    Bodies.rectangle(/*top border*/borderWidth / 2, 0, borderWidth, borderThickness, { isStatic: true }),
+    Bodies.rectangle(/*bottom border*/borderWidth / 2, borderHeight, borderWidth, borderThickness, { isStatic: true }),
+    Bodies.rectangle(/*left border*/0, borderHeight / 2, borderThickness, borderHeight, { isStatic: true }),
+    Bodies.rectangle(/*right border*/borderWidth, borderHeight / 2, borderThickness, borderHeight, { isStatic: true })
 ];
 World.add(world, walls);
 
 //Maze Generation
 const rows = 10;
-const columns = 10;
+const columns = Math.round(rows*borderWidth/borderHeight);
 const grid = Array.from(Array(rows), () => Array(columns).fill(false));
 const verticalWalls = Array.from(Array(rows), () => Array(columns - 1).fill(true));
 const horizontalWalls = Array.from(Array(rows - 1), () => Array(columns).fill(true));
