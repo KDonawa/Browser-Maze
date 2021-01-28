@@ -148,7 +148,7 @@ function addPlayer(){
     
     //movement
     document.addEventListener('keydown', (event) => {
-        const speed = 7;
+        const speed = 1/rows*60;
         const {x, y} = player.velocity;
         
         if(event.key === "w"){
