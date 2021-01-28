@@ -33,15 +33,16 @@ const grid = Array.from(Array(rows), () => Array(columns).fill(false));
 const verticals = Array.from(Array(rows), () => Array(columns - 1).fill(false));
 const horizontals = Array.from(Array(rows - 1), () => Array(columns).fill(false));
 
-function traverseMaze(r, c) {
-    if (grid[r][c] === true) return;
+function generateMaze(r, c) {
+    if (hasVisited([r,c])) return;
 
     grid[r][c] = true; // mark as visited
-    const neighbors = shuffle(getNeighbors(r, c)); // get list of random valid neighbors
+    const neighbors = shuffle(getNeighbors(r, c));
     for (const neighbor of neighbors) {
         if(!hasVisited(neighbor)) moveTo(neighbor);
     }
 }
+
 function moveTo([r, c, dir]) {
     switch (dir) {
         case 'left':
@@ -60,8 +61,7 @@ function moveTo([r, c, dir]) {
             console.log("invalid direction");
             break;
     }
-
-    traverseMaze(r,c);
+    generateMaze(r,c);
 }
 
 function getNeighbors(r, c) {
@@ -80,16 +80,13 @@ function isValidNeighbor([r, c]) {
 const hasVisited = ([r,c]) => grid[r][c] === true;
 
 function shuffle(arr) {
-    const count = arr.length;
-    for (let i = count - 1; i >= 0; i--) {
-        const swapIndex = Math.floor(Math.random() * count);
-        const temp = arr[i];
-        arr[i] = arr[swapIndex];
-        arr[swapIndex] = temp;
+    for (let i = arr.length - 1; i >= 0; i--) {
+        const swapIndex = Math.floor(Math.random() * arr.length);
+        [arr[i], arr[swapIndex]] = [arr[swapIndex], arr[i]];
     }
     return arr;
 }
 
 const startRow = Math.floor(Math.random() * rows);
 const startCol = Math.floor(Math.random() * columns);
-traverseMaze(startRow, startCol);
+generateMaze(startRow, startCol);
