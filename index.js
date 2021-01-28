@@ -1,9 +1,10 @@
 const borderWidth = 600;
 const borderHeight = 600;
 
-const { Engine, Render, Runner, World, Bodies } = Matter;
+const { Engine, Render, Runner, World, Bodies, Body, Events } = Matter;
 
 const engine = Engine.create();
+engine.world.gravity.y = 0;
 const { world } = engine;
 const render = Render.create({
     element: document.body,
@@ -119,17 +120,38 @@ function drawMaze() {
 function addGoal() {
     const xPos = borderWidth - 0.5 * cellWidth;
     const yPos = borderHeight - 0.5 * cellHeight;
-    const goal = Bodies.rectangle(xPos, yPos, cellWidth*0.5, cellHeight*0.5, {isStatic:true});
+    const goal = Bodies.rectangle(xPos, yPos, cellWidth*0.5, cellHeight*0.5, {
+        isStatic:true,
+        label: 'goal'
+    });
     World.add(world, goal);
 }
-
-//Ball
+//Player
 function addPlayer(){
     const xPos = cellWidth/2;
     const yPos = cellHeight/2;
     const r = cellWidth < cellHeight ? 0.25*cellWidth : 0.25*cellHeight;
-    const player = Bodies.circle(xPos, yPos, r);
-    World.add(world, player);
+    const player = Bodies.circle(xPos, yPos, r, {label: 'player'});
+    World.add(world, player);  
+    
+    //movement
+    document.addEventListener('keydown', (event) => {
+        const speed = 7;
+        const {x, y} = player.velocity;
+        
+        if(event.key === "w"){
+            Body.setVelocity(player, {x:x,y:-speed});
+        }
+        if(event.key === "s"){
+            Body.setVelocity(player, {x:x,y:speed});
+        }
+        if(event.key === "a"){
+            Body.setVelocity(player, {x:-speed,y:y});
+        }
+        if(event.key === "d"){
+            Body.setVelocity(player, {x:speed,y:y});
+        }
+    });
 }
 
 const startRow = Math.floor(Math.random() * rows);
