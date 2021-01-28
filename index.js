@@ -43,7 +43,6 @@ function generateMaze(r, c) {
         if (!hasVisited(neighbor)) moveTo(neighbor);
     }
 }
-
 function moveTo([r, c, dir]) {
     switch (dir) {
         case 'left':
@@ -64,7 +63,6 @@ function moveTo([r, c, dir]) {
     }
     generateMaze(r, c);
 }
-
 function getNeighbors(r, c) {
     return [
         [r, c - 1, 'left'],
@@ -73,11 +71,9 @@ function getNeighbors(r, c) {
         [r + 1, c, 'down']
     ].filter(x => isValidNeighbor(x));
 }
-
 function isValidNeighbor([r, c]) {
     return (r >= 0 && r < rows) && (c >= 0 && c < columns) && !hasVisited([r, c]);
 }
-
 const hasVisited = ([r, c]) => grid[r][c] === true;
 
 function shuffle(arr) {
@@ -88,7 +84,7 @@ function shuffle(arr) {
     return arr;
 }
 
-//Draw Maze
+//Drawing Maze
 const wallThickness = 5;
 const cellWidth = borderWidth / columns;
 const cellHeight = borderHeight / rows;
@@ -100,7 +96,7 @@ function drawMaze() {
             if (wall) {
                 const xPos = (j + 0.5) * cellWidth;
                 const yPos = (i + 1) * cellHeight;
-                const wallRender = Bodies.rectangle(xPos, yPos, cellWidth, wallThickness, {isStatic: true});
+                const wallRender = Bodies.rectangle(xPos, yPos, cellWidth, wallThickness, { isStatic: true });
                 World.add(world, wallRender);
             }
         }
@@ -112,14 +108,33 @@ function drawMaze() {
             if (wall) {
                 const xPos = (j + 1) * cellWidth;
                 const yPos = (i + 0.5) * cellHeight;
-                const wallRender = Bodies.rectangle(xPos, yPos, wallThickness, cellHeight, {isStatic: true});
+                const wallRender = Bodies.rectangle(xPos, yPos, wallThickness, cellHeight, { isStatic: true });
                 World.add(world, wallRender);
             }
         }
     }
 }
 
+//Goal
+function addGoal() {
+    const xPos = borderWidth - 0.5 * cellWidth;
+    const yPos = borderHeight - 0.5 * cellHeight;
+    const goal = Bodies.rectangle(xPos, yPos, cellWidth*0.5, cellHeight*0.5, {isStatic:true});
+    World.add(world, goal);
+}
+
+//Ball
+function addPlayer(){
+    const xPos = cellWidth/2;
+    const yPos = cellHeight/2;
+    const r = cellWidth < cellHeight ? 0.25*cellWidth : 0.25*cellHeight;
+    const player = Bodies.circle(xPos, yPos, r);
+    World.add(world, player);
+}
+
 const startRow = Math.floor(Math.random() * rows);
 const startCol = Math.floor(Math.random() * columns);
 generateMaze(startRow, startCol);
 drawMaze();
+addGoal();
+addPlayer();
